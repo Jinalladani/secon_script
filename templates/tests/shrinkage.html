@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shrinkage Limit Test – Observation Sheet Generator V5.2</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dst.css') }}">
+  <style>
+    .tk-tree-selected {
+      background-color: #0078d7 !important;
+      color: #ffffff !important;
+    }
+    .tk-treeview thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background-color: #eef3fb;
+    }
+    .tk-scroll-container {
+      width: 100%;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      border: 1px solid #7a7a7a;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .tk-scroll-container::-webkit-scrollbar {
+      height: 12px;
+      width: 12px;
+    }
+    .tk-scroll-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border: 1px solid #dcdcdc;
+    }
+    .tk-scroll-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border: 1px solid #a8a8a8;
+      border-radius: 2px;
+    }
+    .tk-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #a0a0a0;
+    }
+  </style>
+</head>
+<body class="dst-native-gui">
+  <div class="tk-window" style="max-width: 100%; width: 100%; margin: 0 auto; box-sizing: border-box;">
+    
+    <!-- Top Back to Portal Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <a href="/" style="color: #0066cc; text-decoration: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 4px;">
+        <i class="fas fa-arrow-left"></i> Back to Main Portal
+      </a>
+      <span style="font-size: 8.5pt; color: #666;">GOMA Geotechnical Laboratory Suite</span>
+    </div>
+
+    <!-- Title -->
+    <div class="tk-title" style="font-size: 15pt; margin-bottom: 8px;">
+      Shrinkage Limit Test – Observation Sheet Generator V5.2
+    </div>
+
+    <!-- 1. Test / Project Information -->
+    <fieldset class="tk-labelframe" style="padding: 10px; margin-bottom: 8px;">
+      <legend class="tk-legend">Test / Project Information</legend>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <label style="font-size: 9pt; width: 60px;">BH ID</label>
+        <input type="text" id="bh_id" value="RBH-12" class="tk-entry" style="width: 180px;">
+        <span class="tk-note" style="margin: 0; font-style: normal; color: #444;">BH ID is common for all depth entries.</span>
+      </div>
+    </fieldset>
+
+    <!-- 2. Required Input – Multiple Depths -->
+    <fieldset class="tk-labelframe" style="padding: 10px; margin-bottom: 8px;">
+      <legend class="tk-legend">Required Input – Multiple Depths</legend>
+      
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <label style="font-size: 9pt;">Depth (m)</label>
+          <input type="text" id="inpDepth" value="" placeholder="1.50" class="tk-entry" style="width: 90px; text-align: center;">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <label style="font-size: 9pt;">Sample Type</label>
+          <select id="inpSampleType" class="tk-table-select" style="width: 110px;">
+            <option value="UDS" selected>UDS</option>
+            <option value="SPT">SPT</option>
+            <option value="DS">DS</option>
+            <option value="Block Sample">Block Sample</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <label style="font-size: 9pt;">Soil Class</label>
+          <select id="inpSoilClass" class="tk-table-select" style="width: 75px;">
+            <option value="CL" selected>CL</option>
+            <option value="CI">CI</option>
+            <option value="CH">CH</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <label style="font-size: 9pt;">Dish No.</label>
+          <select id="inpDish" class="tk-table-select" style="width: 90px;">
+            <!-- Populated SL_01 to SL_10 -->
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <label style="font-size: 9pt;">LL (%)</label>
+          <input type="text" id="inpLL" value="" placeholder="32.0" class="tk-entry" style="width: 75px; text-align: center;">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <label style="font-size: 9pt;">PL (%)</label>
+          <input type="text" id="inpPL" value="" placeholder="18.0" class="tk-entry" style="width: 75px; text-align: center;">
+        </div>
+
+        <button type="button" class="tk-btn" id="btnAddDepth" style="font-weight: 500; margin-left: 6px;">Add Depth</button>
+        <button type="button" class="tk-btn" id="btnRemoveSelected">Remove Selected</button>
+        <button type="button" class="tk-btn" id="btnClearInputs">Clear Inputs</button>
+      </div>
+
+      <!-- Live Dish Info -->
+      <div id="dishInfoLine" style="color: #555555; font-size: 8.5pt; margin-top: 8px;"></div>
+      <div style="color: #555555; font-size: 8.5pt; margin-top: 4px;">
+        Classification rule: LL &lt; 35 = CL | 35 ≤ LL ≤ 50 = CI | LL &gt; 50 = CH
+      </div>
+
+      <!-- Input Depths Table -->
+      <div class="tk-scroll-container" style="margin-top: 8px; max-height: 140px;">
+        <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; min-width: 750px;">
+          <thead>
+            <tr>
+              <th style="width: 120px;">Depth (m)</th>
+              <th style="width: 145px;">Sample Type</th>
+              <th style="width: 95px;">Soil Class</th>
+              <th style="width: 120px;">Dish No.</th>
+              <th style="width: 90px;">LL (%)</th>
+              <th style="width: 90px;">PL (%)</th>
+              <th style="width: 90px;">PI (%)</th>
+            </tr>
+          </thead>
+          <tbody id="inputDepthsTableBody">
+            <tr id="emptyInputRow">
+              <td colspan="7" style="text-align: center; color: #888; font-style: italic; padding: 12px;">
+                No depth rows added yet. Enter values above and click "Add Depth".
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </fieldset>
+
+    <!-- 3. Dish Details Table -->
+    <fieldset class="tk-labelframe" style="padding: 8px; margin-bottom: 8px;">
+      <legend class="tk-legend">Shrinkage Limit Dish / Container Details</legend>
+      <div class="tk-scroll-container" style="max-height: 140px;">
+        <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; min-width: 800px;">
+          <thead>
+            <tr>
+              <th style="width: 125px;">Sr. No.</th>
+              <th style="width: 125px;">Dish No.</th>
+              <th style="width: 125px;">Weight (g)</th>
+              <th style="width: 125px;">Diameter (mm)</th>
+              <th style="width: 125px;">Height (mm)</th>
+              <th style="width: 185px;">Calculated Dish Volume (cm³)</th>
+            </tr>
+          </thead>
+          <tbody id="dishDetailsTableBody">
+            <!-- 10 Calibrated Containers -->
+          </tbody>
+        </table>
+      </div>
+    </fieldset>
+
+    <!-- 4. Action Buttons -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0; flex-wrap: wrap; gap: 8px;">
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="tk-btn" id="btnGenerate" style="font-weight: bold; padding: 4px 14px; height: 28px;">
+          Generate Observation Data
+        </button>
+        <button type="button" class="tk-btn" id="btnExportExcel" style="padding: 4px 14px; height: 28px;">
+          Export to Excel
+        </button>
+        <button type="button" class="tk-btn" id="btnClearResults" style="padding: 4px 14px; height: 28px;">
+          Clear Results
+        </button>
+      </div>
+      <div style="font-size: 8pt; color: #555555; font-style: italic;">
+        Synthetic data for testing/template development only; not a substitute for measured laboratory observations.
+      </div>
+    </div>
+
+    <!-- 5. Shrinkage Limit Observation Sheet Table -->
+    <fieldset class="tk-labelframe" style="padding: 8px; margin-bottom: 12px;">
+      <legend class="tk-legend">Shrinkage Limit – Observation Sheet</legend>
+      <div class="tk-scroll-container" style="max-height: 380px;">
+        <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; min-width: 2250px; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th style="min-width: 120px;">BH ID</th>
+              <th style="min-width: 110px;">Depth (m)</th>
+              <th style="min-width: 130px;">Sample Type</th>
+              <th style="min-width: 110px;">Soil Class</th>
+              <th style="min-width: 110px;">Dish No.</th>
+              <th style="min-width: 210px;">Empty Container Weight (W1), g</th>
+              <th style="min-width: 240px;">Container + Wet Soil Weight (W2), g</th>
+              <th style="min-width: 240px;">Container + Dry Soil Weight (W3), g</th>
+              <th style="min-width: 160px;">Wet Soil Mass (M1), g</th>
+              <th style="min-width: 160px;">Dry Soil Mass (M2), g</th>
+              <th style="min-width: 220px;">Volume of Wet Soil Pat (V1), cm³</th>
+              <th style="min-width: 230px;">Mass of Displaced Mercury (Mv), g</th>
+              <th style="min-width: 220px;">Volume of Dry Soil Pat (V2), cm³</th>
+              <th style="min-width: 180px;">Shrinkage Limit (SL), %</th>
+            </tr>
+          </thead>
+          <tbody id="observationTableBody">
+            <tr id="emptyResultRow">
+              <td colspan="14" style="text-align: center; color: #888; font-style: italic; padding: 25px;">
+                No observation data generated yet. Add depths above and click "Generate Observation Data".
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </fieldset>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/shrinkage.js') }}"></script>
+</body>
+</html>

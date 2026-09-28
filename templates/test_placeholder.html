@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ test.name }} - GOMA Geotechnical Lab</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="container header-content">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon">
+          <i class="fas fa-microscope"></i>
+        </div>
+        <div>
+          <div class="brand-title">GOMA Geotechnical Lab</div>
+          <div class="brand-subtitle">Soil Mechanics & Laboratory Suite</div>
+        </div>
+      </a>
+      
+      <div class="header-status">
+        <a href="/" class="back-link">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <div class="page-top-bar">
+      <div>
+        <span class="test-category">{{ test.category }}</span>
+        <h1 style="font-size: 1.8rem; font-weight: 700; color: #fff;">{{ test.name }}</h1>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">
+          Standard: <strong>{{ test.standard }}</strong> | Source Directory: <code>{{ test.folder }}</code>
+        </p>
+      </div>
+
+      <span class="integration-badge">
+        <i class="fas fa-plug"></i> Ready for Script Integration
+      </span>
+    </div>
+
+    <!-- Placeholder Card -->
+    <div class="placeholder-box">
+      <div class="placeholder-icon">
+        <i class="{{ test.icon }}"></i>
+      </div>
+      <h2 class="placeholder-title">{{ test.name }} Module</h2>
+      <p class="placeholder-text">
+        {{ test.description }}
+      </p>
+
+      <div style="margin: 28px 0; padding: 18px; background: rgba(0,0,0,0.25); border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
+          <strong style="color: #fff;">Status:</strong> Portal Route Configured
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
+          <strong style="color: #fff;">Target Script:</strong> <code>{{ test.folder }}</code>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+          <strong style="color: #fff;">Integration Mode:</strong> Zero Logic Modification (Exact UI & Processing Flow match)
+        </div>
+      </div>
+
+      <a href="/" class="back-link" style="display: inline-flex; margin-top: 10px;">
+        <i class="fas fa-home"></i> Return to Main Index
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="container footer-content">
+      <div>
+        <strong>GOMA Geotechnical Engineering Suite</strong>
+      </div>
+      <div>
+        <span>Server Mode: Local / LAN Distribution</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Dynamic Theme Color Script -->
+  <script>
+    document.documentElement.style.setProperty('--card-accent', '{{ test.color }}');
+  </script>
+</body>
+</html>

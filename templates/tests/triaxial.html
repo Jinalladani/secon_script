@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Assisted UU Triaxial Data Generator - Multi Depth</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dst.css') }}">
+  <style>
+    .tk-scroll-box {
+      width: 100%;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      border: 1px solid #7a7a7a;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .tk-scroll-box::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+    .tk-scroll-box::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border: 1px solid #dcdcdc;
+    }
+    .tk-scroll-box::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border: 1px solid #a8a8a8;
+      border-radius: 2px;
+    }
+    .tk-scroll-box::-webkit-scrollbar-thumb:hover {
+      background: #a0a0a0;
+    }
+    .tk-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .tk-modal-window {
+      background: #f0f0f0;
+      border: 2px solid #0078d7;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      padding: 12px;
+      max-width: 1100px;
+      width: 95%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body class="dst-native-gui">
+  <div class="tk-window" style="max-width: 1420px; width: 100%; margin: 0 auto;">
+    
+    <!-- Top Back to Portal Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+      <a href="/" style="color: #0066cc; text-decoration: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 4px;">
+        <i class="fas fa-arrow-left"></i> Back to Main Portal
+      </a>
+      <span style="font-size: 8.5pt; color: #666;">GOMA Geotechnical Laboratory Suite</span>
+    </div>
+
+    <!-- Title -->
+    <div class="tk-title" style="font-size: 15pt; text-align: left; margin-bottom: 6px;">
+      AI-Assisted UU Triaxial Synthetic Data Generator
+    </div>
+
+    <!-- 1. Common Test Settings -->
+    <fieldset class="tk-labelframe" style="padding: 8px 12px; margin-bottom: 6px;">
+      <legend class="tk-legend">Common Test Settings</legend>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 24px; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size: 9pt; width: 230px;">Borehole ID</label>
+          <input type="text" id="commonBhId" value="BH-01" class="tk-entry" style="width: 220px;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size: 9pt; width: 250px;">Initial Date/Time (dd-mm-yyyy HH:MM:SS)</label>
+          <input type="text" id="commonDateTime" value="05-08-2026 15:47:00" class="tk-entry" style="width: 220px;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size: 9pt; width: 230px;">Nominal Data Recording Interval (mm)</label>
+          <input type="text" id="commonInterval" value="0.10" class="tk-entry" style="width: 220px;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size: 9pt; width: 250px;">Random Seed</label>
+          <input type="text" id="commonSeed" value="20260816" class="tk-entry" style="width: 220px;">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- 2. Multiple Depth Input -->
+    <fieldset class="tk-labelframe" style="padding: 7px 10px; margin-bottom: 6px;">
+      <legend class="tk-legend">Multiple Depth Input | Diameter & Height are entered separately for each depth</legend>
+      <div style="font-size: 8.5pt; color: #333333; margin-bottom: 5px;">
+        Each depth is an independent specimen set. Enter diameter, height, sample type, soil, Cu, φ and three cell pressures.
+      </div>
+
+      <div class="tk-scroll-box" style="max-height: 220px;">
+        <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; min-width: 1100px; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Depth (m)</th>
+              <th style="width: 95px;">Diameter (cm)</th>
+              <th style="width: 85px;">Height (cm)</th>
+              <th style="width: 95px;">Density (gm/cc)</th>
+              <th style="width: 95px;">Sample Type</th>
+              <th style="width: 170px;">Soil Type</th>
+              <th style="width: 90px;">Cu (kg/cm²)</th>
+              <th style="width: 75px;">φ (°)</th>
+              <th style="width: 105px;">Cell Pressure 1</th>
+              <th style="width: 105px;">Cell Pressure 2</th>
+              <th style="width: 105px;">Cell Pressure 3</th>
+              <th style="width: 55px;">Select</th>
+              <th style="width: 75px;">Preview</th>
+            </tr>
+          </thead>
+          <tbody id="triaxialTableBody">
+            <!-- Dynamic Depth Rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; align-items: center;">
+        <button type="button" class="tk-btn" id="btnAddRow">+ Add Depth</button>
+        <button type="button" class="tk-btn" id="btnRemoveSelected">Remove Selected Depth</button>
+        <button type="button" class="tk-btn" id="btnClearAll">Clear All</button>
+        <button type="button" class="tk-btn" id="btnAdd5Rows">Add 5 Depth Rows</button>
+        <button type="button" class="tk-btn" id="btnPreviewSelected" style="margin-left: 10px;">Preview Selected</button>
+        <button type="button" class="tk-btn" id="btnImportExcel" style="margin-left: 10px;">Import Excel Input</button>
+        <input type="file" id="triaxFileInput" accept=".xlsx,.xlsm" style="display: none;">
+      </div>
+    </fieldset>
+
+    <!-- 3. Main Actions Bar -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; align-items: center;">
+      <button type="button" class="tk-btn" id="btnGenerateAll" style="font-weight: bold; padding: 4px 14px;">Generate All Data</button>
+      <button type="button" class="tk-btn" id="btnFinalMohrPlot">Final Mohr Plot</button>
+      <button type="button" class="tk-btn" id="btnExportAllPlots">Export All Mohr Plots</button>
+      <button type="button" class="tk-btn" id="btnSaveCsv">Save CSV</button>
+      <button type="button" class="tk-btn" id="btnPopulateXlsm">Populate XLSM Template</button>
+      <button type="button" class="tk-btn" id="btnExportAll" style="font-weight: bold; background: #e0edff; border: 1px solid #0078d7; color: #004b99;"><i class="fas fa-file-archive" style="margin-right: 4px;"></i>All Export</button>
+    </div>
+
+    <!-- 4. Lower Area: Preview & Observation Table (Grid 2 cols) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px;">
+      
+      <!-- Left: Mohr Failure Envelope Preview -->
+      <fieldset class="tk-labelframe" style="margin: 0; padding: 6px;">
+        <legend class="tk-legend">Mohr Failure Envelope Preview | Realistic generated-test preview</legend>
+        <div style="background: white; border: 1px solid #7a7a7a; height: 350px; min-height: 350px; position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 4px;">
+          <img id="mohrPreviewImage" src="" alt="Mohr Failure Envelope Preview" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: none;">
+          <canvas id="mohrCanvas" width="720" height="340" style="width: 100%; height: 100%; display: block;"></canvas>
+        </div>
+      </fieldset>
+
+      <!-- Right: Generated Observations Preview -->
+      <fieldset class="tk-labelframe" style="margin: 0; padding: 6px;">
+        <legend class="tk-legend" id="obsLegend">Generated Observations Preview</legend>
+        <div class="tk-scroll-box" style="height: 320px;">
+          <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; white-space: nowrap;">
+            <thead>
+              <tr>
+                <th style="width: 55px;">Seq#</th>
+                <th style="width: 75px;">Depth (m)</th>
+                <th style="width: 75px;">Test</th>
+                <th style="width: 85px;">Sample Type</th>
+                <th style="width: 135px;">DateTime</th>
+                <th style="width: 95px;">STRAIN (mm)</th>
+                <th style="width: 95px;">LOAD (kg)</th>
+              </tr>
+            </thead>
+            <tbody id="obsTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: #888; font-style: italic; padding: 30px;">
+                  No generated observations. Click "Generate All Data" or "Preview".
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+
+    </div>
+
+    <!-- 5. Status Bar -->
+    <div id="statusVar" style="font-size: 8.5pt; color: #000000; padding: 2px 4px;">
+      Ready. Edit depths and use Preview Selected to inspect a realistic generated-test envelope.
+    </div>
+
+  </div>
+
+  <!-- Final Mohr Plot Dialog Modal -->
+  <div id="finalPlotModal" class="tk-modal-overlay">
+    <div class="tk-modal-window">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 11pt; font-weight: bold;" id="modalTitle">Final UU Mohr's Circle Plot</span>
+        <button type="button" class="tk-btn" id="btnModalClose" style="padding: 1px 8px;">✕</button>
+      </div>
+      
+      <!-- Depth selector dropdown -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <label style="font-size: 9pt; font-weight: bold;">Select Depth:</label>
+        <select id="modalDepthSelect" class="tk-table-select" style="width: 320px; font-weight: 500;"></select>
+        <button type="button" class="tk-btn" id="btnModalPlotDepth" style="font-weight: bold;">View Report Plot</button>
+        <button type="button" class="tk-btn" id="btnModalSavePng" style="margin-left: auto;">Save Plot Image</button>
+      </div>
+
+      <!-- Report View Container -->
+      <div class="tk-scroll-box" style="flex: 1; min-height: 480px; background: white; text-align: center; padding: 8px;">
+        <img id="modalReportImage" src="" alt="Report Plot" style="max-width: 100%; height: auto; border: 1px solid #ccc; display: none; margin: 0 auto;">
+        <div id="modalLoading" style="padding: 60px; color: #666; font-size: 10pt;">
+          <i class="fas fa-spinner fa-spin" style="font-size: 20pt; color: #0078d7; margin-bottom: 10px;"></i><br>
+          Rendering high-resolution Mohr-Coulomb report sheet...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/triaxial.js') }}"></script>
+</body>
+</html>

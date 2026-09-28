@@ -1,0 +1,12 @@
+/* FSI Specific Desktop Styling */
+.fsi-soil-select {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #7a7a7a;
+  border-radius: 0px;
+  padding: 2px 4px;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-size: 9pt;
+  height: 23px;
+  outline: none;
+}

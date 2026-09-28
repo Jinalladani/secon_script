@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soil & Groundwater Chemical Test Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dst.css') }}">
+  <style>
+    .tk-scroll-box {
+      width: 100%;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      border: 1px solid #7a7a7a;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .tk-scroll-box::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+    .tk-scroll-box::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border: 1px solid #dcdcdc;
+    }
+    .tk-scroll-box::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border: 1px solid #a8a8a8;
+      border-radius: 2px;
+    }
+    .chem-tabs-nav {
+      display: flex;
+      gap: 2px;
+      margin-top: 4px;
+      border-bottom: 2px solid #7a7a7a;
+    }
+    .chem-tab-btn {
+      padding: 5px 14px;
+      font-size: 8.5pt;
+      font-family: inherit;
+      border: 1px solid #7a7a7a;
+      border-bottom: none;
+      background: #e0e0e0;
+      cursor: pointer;
+      border-radius: 3px 3px 0 0;
+      color: #333;
+    }
+    .chem-tab-btn.active {
+      background: #f0f0f0;
+      font-weight: bold;
+      color: #000;
+      border-top: 2px solid #0078d7;
+      border-bottom: 2px solid #f0f0f0;
+      margin-bottom: -2px;
+      z-index: 2;
+    }
+    .chem-tab-content {
+      display: none;
+      background: #f0f0f0;
+      border: 1px solid #7a7a7a;
+      border-top: none;
+      padding: 8px;
+    }
+    .chem-tab-content.active {
+      display: block;
+    }
+    .badge-pass {
+      background: #e6f4ea;
+      color: #137333;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+      font-size: 8pt;
+    }
+    .badge-check {
+      background: #fce8e6;
+      color: #c5221f;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+      font-size: 8pt;
+    }
+    .tk-grid-input {
+      width: 100%;
+      height: 22px;
+      box-sizing: border-box;
+      font-size: 8.5pt;
+      padding: 1px 4px;
+      border: 1px solid #999;
+      background: #fff;
+    }
+    .tk-grid-select {
+      width: 100%;
+      height: 22px;
+      box-sizing: border-box;
+      font-size: 8.5pt;
+      padding: 0 2px;
+      border: 1px solid #999;
+      background: #fff;
+    }
+  </style>
+</head>
+<body class="dst-native-gui">
+  <div class="tk-window" style="max-width: 1480px; width: 100%; margin: 0 auto;">
+    
+    <!-- Top Back to Portal Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+      <a href="/" style="color: #0066cc; text-decoration: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 4px;">
+        <i class="fas fa-arrow-left"></i> Back to Main Portal
+      </a>
+      <span style="font-size: 8.5pt; color: #666;">GOMA Geotechnical Laboratory Suite</span>
+    </div>
+
+    <!-- Title Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+      <div class="tk-title" style="font-size: 16pt; text-align: left; margin: 0;">
+        Soil & Groundwater Chemical Test Generator v2
+      </div>
+      <div style="font-size: 8.5pt; color: #666; font-style: italic;">
+        Synthetic data only
+      </div>
+    </div>
+
+    <!-- 1. Project & Generation Settings -->
+    <fieldset class="tk-labelframe" style="padding: 8px 12px; margin-bottom: 6px;">
+      <legend class="tk-legend" style="font-weight: 500;">Project & Generation Settings</legend>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label style="font-size: 8.5pt;">Project:</label>
+          <input type="text" id="projectVar" class="tk-entry" style="width: 160px;" placeholder="e.g. River Bridge">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label style="font-size: 8.5pt;">Location:</label>
+          <input type="text" id="locationVar" class="tk-entry" style="width: 160px;" placeholder="e.g. Ahmedabad">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label style="font-size: 8.5pt;">No. of Boreholes:</label>
+          <input type="number" id="countVar" value="5" min="1" max="500" class="tk-entry" style="width: 60px; text-align: center;">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label style="font-size: 8.5pt;">Environment:</label>
+          <select id="envVar" class="tk-table-select" style="width: 190px;">
+            <option value="Normal River">Normal River</option>
+            <option value="Desert River">Desert River</option>
+            <option value="Natural Ground / Bare Land">Natural Ground / Bare Land</option>
+            <option value="Agricultural Field">Agricultural Field</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label style="font-size: 8.5pt;">Seed:</label>
+          <input type="text" id="seedVar" class="tk-entry" style="width: 80px; text-align: center;" placeholder="123456">
+          <button type="button" class="tk-btn" id="btnRandomSeed" title="Randomize Seed" style="padding: 2px 6px;">
+            <i class="fas fa-dice"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+          <button type="button" class="tk-btn" id="btnGenerate" style="font-weight: bold; background: #2563eb; color: #fff; border-color: #1d4ed8; padding: 4px 14px;">
+            <i class="fas fa-play" style="margin-right: 4px;"></i> Generate
+          </button>
+          <button type="button" class="tk-btn" id="btnImportExcel" style="padding: 4px 12px;">
+            <i class="fas fa-file-import" style="margin-right: 4px;"></i> Import Excel
+          </button>
+          <button type="button" class="tk-btn" id="btnExportExcel" style="padding: 4px 12px; background: #107c41; color: #fff; border-color: #0c5e31; font-weight: bold;">
+            <i class="fas fa-file-excel" style="margin-right: 4px;"></i> Export Excel
+          </button>
+          <input type="file" id="excelFileInput" accept=".xlsx,.xlsm" style="display: none;">
+        </div>
+
+      </div>
+    </fieldset>
+
+    <!-- Subnote -->
+    <div style="font-size: 8.5pt; color: #444; margin-bottom: 6px; padding: 0 4px;">
+      Each borehole: exactly 2 soil chemical samples + exactly 1 groundwater chemical sample. Enter manual depths, soil classification, conditions and white-residue observation. S-2 may be at or below groundwater depth.
+    </div>
+
+    <!-- 2. Notebook Tabs -->
+    <div class="chem-tabs-nav">
+      <button type="button" class="chem-tab-btn active" data-tab="tab-input">1. Borehole Input</button>
+      <button type="button" class="chem-tab-btn" data-tab="tab-soil">2. Soil Results</button>
+      <button type="button" class="chem-tab-btn" data-tab="tab-gw">3. Groundwater Results</button>
+      <button type="button" class="chem-tab-btn" data-tab="tab-summary">4. Borehole Summary</button>
+      <button type="button" class="chem-tab-btn" data-tab="tab-methods">5. Test Methods</button>
+    </div>
+
+    <!-- TAB 1: Borehole Input -->
+    <div id="tab-input" class="chem-tab-content active">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-size: 8.5pt; font-weight: bold; color: #333;">
+          <i class="fas fa-edit"></i> Editable Borehole Chemical Profiles:
+        </span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="tk-btn" id="btnAddRow" style="padding: 2px 8px; font-size: 8pt;">+ Add Borehole</button>
+          <button type="button" class="tk-btn" id="btnRemoveRow" style="padding: 2px 8px; font-size: 8pt;">- Remove Last</button>
+          <button type="button" class="tk-btn" id="btnResetRows" style="padding: 2px 8px; font-size: 8pt;">Reset Defaults</button>
+        </div>
+      </div>
+
+      <div class="tk-scroll-box" style="max-height: 480px;">
+        <table class="tk-treeview" id="inputTable" style="font-size: 8.5pt; width: 100%; min-width: 1400px; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th style="width: 80px;">BH ID</th>
+              <th style="width: 85px;">S-1 Depth (m)</th>
+              <th style="width: 75px;">S-1 Type</th>
+              <th style="width: 110px;">S-1 Condition</th>
+              <th style="width: 110px;">S-1 Salinity Control</th>
+              <th style="width: 85px;">S-2 Depth (m)</th>
+              <th style="width: 75px;">S-2 Type</th>
+              <th style="width: 110px;">S-2 Condition</th>
+              <th style="width: 110px;">S-2 Salinity Control</th>
+              <th style="width: 85px;">GW Depth (m)</th>
+              <th style="width: 110px;">GW Condition</th>
+              <th style="width: 110px;">GW Salinity Control</th>
+              <th style="width: 95px;">White Residue</th>
+            </tr>
+          </thead>
+          <tbody id="inputTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: Soil Results -->
+    <div id="tab-soil" class="chem-tab-content">
+      <div class="tk-scroll-box" style="max-height: 520px;">
+        <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; min-width: 1350px; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th>BH ID</th>
+              <th>Sample</th>
+              <th>Depth (m)</th>
+              <th>Depth Zone</th>
+              <th>Soil Type</th>
+              <th>Condition</th>
+              <th>Salinity Control</th>
+              <th>Environment</th>
+              <th>pH</th>
+              <th>Chloride (mg/kg)</th>
+              <th>Sulphate (mg/kg)</th>
+              <th>Organic Matter (%)</th>
+              <th>White Residue</th>
+              <th>Chemical Dominance</th>
+              <th>Validation</th>
+            </tr>
+          </thead>
+          <tbody id="soilTableBody">
+            <tr>
+              <td colspan="15" style="text-align: center; color: #888; padding: 20px;">
+                No soil results generated yet. Click <strong>Generate</strong> in the settings bar.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: Groundwater Results -->
+    <div id="tab-gw" class="chem-tab-content">
+      <div class="tk-scroll-box" style="max-height: 520px;">
+        <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; min-width: 1100px; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th>BH ID</th>
+              <th>Sample</th>
+              <th>Depth (m)</th>
+              <th>Environment</th>
+              <th>Condition</th>
+              <th>pH</th>
+              <th>Chloride (mg/L)</th>
+              <th>Sulphate (mg/L)</th>
+              <th>Salinity Condition</th>
+              <th>Chemical Dominance</th>
+              <th>Validation</th>
+            </tr>
+          </thead>
+          <tbody id="gwTableBody">
+            <tr>
+              <td colspan="11" style="text-align: center; color: #888; padding: 20px;">
+                No groundwater results generated yet. Click <strong>Generate</strong> in the settings bar.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: Borehole Summary -->
+    <div id="tab-summary" class="chem-tab-content">
+      <div class="tk-scroll-box" style="max-height: 520px;">
+        <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; min-width: 1800px; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th>BH ID</th>
+              <th>Environment</th>
+              <th>S-1 Depth</th>
+              <th>S-1 Zone</th>
+              <th>S-1 Type</th>
+              <th>S-1 Condition</th>
+              <th>S-1 Salinity</th>
+              <th>S-2 Depth</th>
+              <th>S-2 Zone</th>
+              <th>S-2 Type</th>
+              <th>S-2 Condition</th>
+              <th>S-2 Salinity</th>
+              <th>GW Depth</th>
+              <th>GW Condition</th>
+              <th>GW Salinity</th>
+              <th>White Residue</th>
+              <th>Chemical Dominance</th>
+              <th>S-1 Cl</th>
+              <th>S-2 Cl</th>
+              <th>GW Cl</th>
+              <th>S-1 SO4</th>
+              <th>S-2 SO4</th>
+              <th>GW SO4</th>
+              <th>Overall Check</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTableBody">
+            <tr>
+              <td colspan="24" style="text-align: center; color: #888; padding: 20px;">
+                No summary generated yet. Click <strong>Generate</strong> in the settings bar.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 5: Test Methods -->
+    <div id="tab-methods" class="chem-tab-content">
+      <div class="tk-scroll-box" style="max-height: 520px;">
+        <table class="tk-treeview" style="font-size: 9pt; width: 100%; min-width: 800px;">
+          <thead>
+            <tr>
+              <th style="width: 160px;">Parameter</th>
+              <th style="width: 140px;">Sample</th>
+              <th style="width: 200px;">IS Code / Standard</th>
+              <th>Method</th>
+              <th style="width: 100px;">Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: center; font-weight: bold;">pH</td>
+              <td style="text-align: center;">Soil</td>
+              <td style="text-align: center; color: #1e40af; font-weight: 500;">IS 2720 (Part 26)</td>
+              <td>Electrometric / glass electrode</td>
+              <td style="text-align: center;">pH</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; font-weight: bold;">Chloride</td>
+              <td style="text-align: center;">Soil</td>
+              <td style="text-align: center; color: #1e40af; font-weight: 500;">IS 2720 (Part 27)</td>
+              <td>Water extract; argentometric titration</td>
+              <td style="text-align: center;">mg/kg</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; font-weight: bold;">Sulphate</td>
+              <td style="text-align: center;">Soil</td>
+              <td style="text-align: center; color: #1e40af; font-weight: 500;">IS 2720 (Part 27)</td>
+              <td>Water extract; gravimetric / turbidimetric</td>
+              <td style="text-align: center;">mg/kg</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; font-weight: bold;">Organic Matter</td>
+              <td style="text-align: center;">Soil</td>
+              <td style="text-align: center; color: #1e40af; font-weight: 500;">IS 2720 (Part 22)</td>
+              <td>Wet oxidation</td>
+              <td style="text-align: center;">%</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; font-weight: bold;">pH</td>
+              <td style="text-align: center;">Groundwater</td>
+              <td style="text-align: center; color: #1e40af; font-weight: 500;">IS 3025 (Part 11)</td>
+              <td>Electrometric / glass electrode</td>
+              <td style="text-align: center;">pH</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; font-weight: bold;">Chloride</td>
+              <td style="text-align: center;">Groundwater</td>
+              <td style="text-align: center; color: #1e40af; font-weight: 500;">IS 3025 (Part 32)</td>
+              <td>Argentometric titration</td>
+              <td style="text-align: center;">mg/L</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; font-weight: bold;">Sulphate</td>
+              <td style="text-align: center;">Groundwater</td>
+              <td style="text-align: center; color: #1e40af; font-weight: 500;">IS 3025 (Part 24)</td>
+              <td>Turbidimetric / gravimetric</td>
+              <td style="text-align: center;">mg/L</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. Status Bar Footer -->
+    <div id="statusFooter" style="background: #f0f0f0; border: 1px solid #7a7a7a; padding: 5px 8px; margin-top: 6px; font-size: 8.5pt; color: #222; font-family: 'Consolas', monospace;">
+      Ready.
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/chemical.js') }}"></script>
+</body>
+</html>

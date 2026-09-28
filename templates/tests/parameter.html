@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Strength Parameter Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dst.css') }}">
+  <style>
+    .param-log-box {
+      font-family: 'Consolas', 'Segoe UI Mono', monospace;
+      font-size: 8.5pt;
+      background: #ffffff;
+      border: 1px solid #7a7a7a;
+      padding: 8px 10px;
+      height: 125px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.4;
+      color: #000;
+    }
+    .info-bullet {
+      font-size: 8.5pt;
+      color: #333333;
+      line-height: 1.45;
+      margin-bottom: 4px;
+    }
+    .sheet-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 8pt;
+      font-weight: 600;
+      background: #e0e7ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
+    }
+    .sheet-tab-btn {
+      padding: 3px 10px;
+      font-size: 8.5pt;
+      border: 1px solid #999;
+      background: #f0f0f0;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .sheet-tab-btn.active {
+      background: #2563eb;
+      font-weight: bold;
+      color: #fff;
+      border-color: #1d4ed8;
+    }
+  </style>
+</head>
+<body class="dst-native-gui">
+  <div class="tk-window" style="max-width: 1060px;">
+    
+    <!-- Top Back to Portal Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <a href="/" style="color: #0066cc; text-decoration: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 4px;">
+        <i class="fas fa-arrow-left"></i> Back to Main Portal
+      </a>
+      <span style="font-size: 8.5pt; color: #666;">GOMA Geotechnical Laboratory Suite</span>
+    </div>
+
+    <!-- Title -->
+    <div class="tk-title" style="font-size: 17pt; font-weight: bold; text-align: left; margin: 4px 0 14px 2px;">
+      Engineering Strength Parameter Generator
+    </div>
+
+    <!-- 1. Excel File Box -->
+    <fieldset class="tk-labelframe" style="padding: 12px; margin-bottom: 12px;">
+      <legend class="tk-legend" style="font-weight: 500;">Excel File</legend>
+      
+      <div style="display: grid; grid-template-columns: 110px 1fr 90px; gap: 8px; align-items: center; margin-bottom: 8px;">
+        <label style="font-size: 9pt;">Input Excel:</label>
+        <input type="text" id="inputFilePath" class="tk-entry" style="width: 100%;" readonly placeholder="Select an Excel file with GSD & SPT data...">
+        <button type="button" class="tk-btn" id="btnBrowseInput">Browse</button>
+        <input type="file" id="paramFileInput" accept=".xlsx,.xlsm" style="display: none;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 110px 1fr 90px; gap: 8px; align-items: center; margin-bottom: 8px;">
+        <label style="font-size: 9pt;">Processing:</label>
+        <div style="font-size: 9pt; color: #1e3a8a; font-weight: 500;">
+          All worksheets automatically
+        </div>
+        <div></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 110px 1fr 90px; gap: 8px; align-items: center;">
+        <label style="font-size: 9pt;">Output Excel:</label>
+        <input type="text" id="outputFileName" class="tk-entry" style="width: 100%;" placeholder="Output Excel file name...">
+        <button type="button" class="tk-btn" id="btnSaveAs">Save As</button>
+      </div>
+    </fieldset>
+
+    <!-- 2. Synthetic Variability Box -->
+    <fieldset class="tk-labelframe" style="padding: 12px; margin-bottom: 12px;">
+      <legend class="tk-legend" style="font-weight: 500;">Synthetic Variability</legend>
+      
+      <div style="display: grid; grid-template-columns: 180px 100px 1fr; gap: 8px; align-items: center; margin-bottom: 8px;">
+        <label style="font-size: 9pt;">Variability (%):</label>
+        <input type="text" id="variabilityVar" value="10" class="tk-entry" style="width: 90px; text-align: center;">
+        <span class="tk-note" style="margin: 0; font-style: normal; color: #444;">Recommended starting value: 10</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 180px 100px 1fr; gap: 8px; align-items: center;">
+        <label style="font-size: 9pt;">Random Seed (optional):</label>
+        <input type="text" id="seedVar" value="" class="tk-entry" style="width: 90px; text-align: center;" placeholder="e.g. 42">
+        <span class="tk-note" style="margin: 0; font-style: normal; color: #444;">Use an integer to reproduce the same generated dataset.</span>
+      </div>
+    </fieldset>
+
+    <!-- 3. Important Modelling Changes in v4 -->
+    <fieldset class="tk-labelframe" style="padding: 12px; margin-bottom: 12px; background: #fafafa;">
+      <legend class="tk-legend" style="font-weight: 500;">Important modelling changes in v4</legend>
+      <div style="padding: 2px 4px;">
+        <div class="info-bullet">• Field SPT N is corrected using the supplied IS 2131 overburden and dilatancy procedure.</div>
+        <div class="info-bullet">• N1 and final N1' are shown separately; final N1' is used for strength correlations.</div>
+        <div class="info-bullet">• Effective overburden is evaluated at SPT depth + 0.30 m; density is 1.85 gm/cc to 10 m and 2.00 gm/cc below 10 m; groundwater is at ground level.</div>
+        <div class="info-bullet">• Drained φ' is soil-specific; N60 has strongest influence for granular soils.</div>
+        <div class="info-bullet">• Drained c' is no longer strongly proportional to N60.</div>
+        <div class="info-bullet">• Su, Cu and UCS form one strongly correlated undrained family.</div>
+        <div class="info-bullet">• UU Phi now follows the specified reported laboratory ranges by soil behaviour.</div>
+        <div class="info-bullet" style="padding-left: 12px; color: #555;">For a fully saturated UU interpretation, the theoretical total-stress assumption remains φ = 0°.</div>
+        <div class="info-bullet" style="margin-top: 6px; font-style: italic; color: #666;">The generator is for synthetic/testing datasets and does not replace laboratory measurements.</div>
+      </div>
+    </fieldset>
+
+    <!-- 4. Action Buttons -->
+    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+      <button type="button" class="tk-btn" id="btnGenerate" style="font-weight: bold; padding: 4px 18px; height: 28px;">
+        Generate & Export
+      </button>
+      <button type="button" class="tk-btn" id="btnClear" style="padding: 4px 16px; height: 28px;">
+        Clear
+      </button>
+    </div>
+
+    <!-- 5. Status Log Box -->
+    <fieldset class="tk-labelframe" style="padding: 8px; margin-bottom: 14px;">
+      <legend class="tk-legend" style="font-weight: 500;">Status</legend>
+      <div class="param-log-box" id="statusLog">Ready. Select an Excel file. All worksheets will be processed automatically. Layout on every sheet: A=Depth, G=SPT N, I=Gravel, J=Sand, K=Silt, L=Clay, M=LL, N=PL, S=FMC. Input starts at row 10; output starts at AU.</div>
+    </fieldset>
+
+    <!-- 6. Generated Output & Results Preview (Visible when calculated) -->
+    <div id="resultsSection" style="display: none;">
+      <div style="background: #e6f4ea; border: 1px solid #34a853; border-radius: 4px; padding: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h4 style="margin: 0 0 4px 0; color: #137333; font-size: 11pt;">
+            <i class="fas fa-check-circle"></i> Strength Parameters Generated Successfully!
+          </h4>
+          <span id="resultStats" style="font-size: 9pt; color: #202124;"></span>
+        </div>
+        <a id="btnDownloadResult" href="#" class="tk-btn" style="height: 32px; background: #107c41; color: #fff; border-color: #0c5e31; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center;">
+          <i class="fas fa-download" style="margin-right: 6px;"></i> Download Processed Excel
+        </a>
+      </div>
+
+      <!-- Sheet Tabs & Selector -->
+      <fieldset class="tk-labelframe" style="padding: 8px;">
+        <legend class="tk-legend" style="font-weight: 500;">Calculated Strength Parameters Preview (AU to BN Columns)</legend>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div id="sheetTabsContainer" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+          <div style="font-size: 8.5pt; color: #555;">
+            Displaying sheet: <strong id="currentSheetLabel" style="color: #1e40af;">All</strong>
+          </div>
+        </div>
+
+        <div class="tk-treeview-box" style="max-height: 320px; overflow: auto;">
+          <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; white-space: nowrap;">
+            <thead>
+              <tr>
+                <th>Sheet</th>
+                <th>Row</th>
+                <th>Depth (m)</th>
+                <th>Field N</th>
+                <th>Density (gm/cc)</th>
+                <th>OBD (kg/cm²)</th>
+                <th>pa (kg/cm²)</th>
+                <th>CN Raw</th>
+                <th>CN (IS 2131)</th>
+                <th>N1 (OB)</th>
+                <th>N1' (Final)</th>
+                <th>PI</th>
+                <th>LI</th>
+                <th>Clay Fraction</th>
+                <th>Soil Behaviour</th>
+                <th>K_PI</th>
+                <th>Liquidity Factor</th>
+                <th>Clay Factor</th>
+                <th>Su (kg/cm²)</th>
+                <th>UCS (kg/cm²)</th>
+                <th>c' (kg/cm²)</th>
+                <th>φ' (°)</th>
+                <th>Cu UU (kg/cm²)</th>
+                <th>φ UU (°)</th>
+              </tr>
+            </thead>
+            <tbody id="previewTableBody"></tbody>
+          </table>
+        </div>
+      </fieldset>
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/parameter.js') }}"></script>
+</body>
+</html>

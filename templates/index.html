@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geotechnical Soil Testing Laboratory Suite</title>
+  <meta name="description" content="Web-based testing portal for Geotechnical Soil Mechanics and Laboratory Analysis">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  <div class="bg-pattern"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="container header-content">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon">
+          <i class="fas fa-microscope"></i>
+        </div>
+        <div>
+          <div class="brand-title">GOMA Geotechnical Lab</div>
+          <div class="brand-subtitle">Soil Mechanics & Laboratory Suite</div>
+        </div>
+      </a>
+
+      <div class="header-status">
+        <div class="status-badge">
+          <div class="pulse-dot"></div>
+          <span>Server Active & Online</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <h1 class="hero-title">Geotechnical Laboratory Test Suite</h1>
+      <!-- <p class="hero-description">
+        Access all soil mechanics calculations, synthetic data generators, and test analysis modules directly through your browser.
+      </p> -->
+
+      <!-- Search & Filters -->
+      <div class="controls-bar">
+        <div class="search-box-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="testSearch" class="search-input"
+            placeholder="Search by test name, standard (IS / ASTM), property, or keyword..." autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Stats Summary -->
+      <!-- <div class="stats-summary">
+        <div class="stat-item">
+          <i class="fas fa-flask"></i>
+          <span>Available Modules: <strong id="visibleCount">{{ tests|length }}</strong> of <strong>{{ tests|length
+              }}</strong></span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-shield-alt"></i>
+          <span>Backend Logic: <strong>Isolated & Protected</strong></span>
+        </div>
+      </div> -->
+    </section>
+
+    <!-- Test Modules Grid -->
+    <section class="tests-grid" id="testsGrid">
+      {% for test in tests %}
+      <a href="/tests/{{ test.id }}" target="_blank" rel="noopener noreferrer" class="test-card" id="card-{{ test.id }}"
+        style="--card-accent: {{ test.color }};" data-name="{{ test.name }}" data-category="{{ test.category }}"
+        data-standard="{{ test.standard }}" data-tags="{{ ' '.join(test.tags) }}" data-desc="{{ test.description }}">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">
+              <i class="{{ test.icon }}"></i>
+            </div>
+            <span class="standard-badge">{{ test.standard }}</span>
+          </div>
+
+          <span class="test-category">{{ test.category }}</span>
+          <h2 class="test-name">{{ test.name }}</h2>
+          <p class="test-desc">{{ test.description }}</p>
+
+          <div class="tags-list">
+            {% for tag in test.tags %}
+            <span class="tag-badge">#{{ tag }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <span style="font-size: 0.8rem; color: var(--text-muted);">
+            <i class="fas fa-folder-open" style="margin-right: 4px;"></i> {{ test.folder }}
+          </span>
+          <span class="open-btn">
+            Open Test <i class="fas fa-arrow-right"></i>
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+
+      <!-- No Results Message -->
+      <div class="no-results" id="noResults">
+        <i class="fas fa-search-minus"></i>
+        <h3>No matching tests found</h3>
+        <p style="color: var(--text-muted); margin-top: 8px;">Try adjusting your search terms or category filter.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="container footer-content">
+      <div>
+        <strong>GOMA Geotechnical Engineering Suite</strong> &mdash; Centralized Browser Interface
+      </div>
+      <div>
+        <span>Server Mode: Local / LAN Distribution</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

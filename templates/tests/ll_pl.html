@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LL & PL Synthetic Data Generator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dst.css') }}">
+  <style>
+    body.tk-llpl-body {
+      background-color: #f0f0f0;
+      color: #000000;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 9pt;
+      margin: 0;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .tk-llpl-window {
+      width: 900px;
+      max-width: 100%;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tk-main-title {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 18pt;
+      font-weight: bold;
+      color: #000000;
+      text-align: center;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    .tk-subtitle {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 10pt;
+      color: #000000;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* LabelFrame */
+    .tk-lf {
+      border: 1px solid #d0d0d0;
+      background-color: #f0f0f0;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 0px;
+    }
+
+    .tk-lf-legend {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      font-weight: normal;
+      color: #000000;
+      padding: 0 4px;
+    }
+
+    /* Header Grid (Borehole Info) */
+    .tk-bh-grid {
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr;
+      align-items: center;
+      gap: 8px 12px;
+    }
+
+    .tk-bh-grid label {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      color: #000000;
+      white-space: nowrap;
+    }
+
+    .tk-bh-entry {
+      background-color: #ffffff;
+      border: 1px solid #7a7a7a;
+      border-radius: 0px;
+      padding: 2px 6px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      color: #000000;
+      height: 24px;
+      width: 100%;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .tk-bh-entry:focus {
+      border: 1px solid #0078d7;
+    }
+
+    /* Sample Table Frame */
+    .tk-table-frame {
+      border: 1px solid #d0d0d0;
+      background-color: #f0f0f0;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .tk-table-header-grid {
+      display: grid;
+      grid-template-columns: 80px 140px 170px 180px 180px 18px;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .tk-th {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 10pt;
+      font-weight: bold;
+      text-align: center;
+      color: #000000;
+      padding: 2px 3px 6px 3px;
+    }
+
+    /* Scrollable Rows Container */
+    .tk-rows-scroll {
+      max-height: 440px;
+      overflow-y: scroll;
+      padding-right: 2px;
+    }
+
+    .tk-row-grid {
+      display: grid;
+      grid-template-columns: 80px 140px 170px 180px 180px;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .tk-row-label {
+      text-align: center;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      color: #000000;
+    }
+
+    .tk-row-input {
+      background-color: #ffffff;
+      border: 1px solid #7a7a7a;
+      border-radius: 0px;
+      padding: 2px 4px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      text-align: center;
+      color: #000000;
+      height: 23px;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .tk-row-input:focus {
+      border: 1px solid #0078d7;
+    }
+
+    .tk-row-select {
+      background-color: #ffffff;
+      border: 1px solid #7a7a7a;
+      border-radius: 0px;
+      padding: 1px 2px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      text-align: center;
+      color: #000000;
+      height: 25px;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    /* Bottom Control Bar */
+    .tk-bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 4px;
+    }
+
+    .tk-status-label {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      color: #000000;
+      flex-grow: 1;
+    }
+
+    .tk-btn-group {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .tk-native-btn {
+      background: linear-gradient(180deg, #fbfbfb 0%, #e1e1e1 100%);
+      border: 1px solid #707070;
+      border-radius: 2px;
+      padding: 4px 14px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      color: #000000;
+      cursor: pointer;
+      min-width: 90px;
+      height: 26px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      outline: none;
+    }
+
+    .tk-native-btn:hover {
+      background: linear-gradient(180deg, #e5f1fb 0%, #cbe4f7 100%);
+      border-color: #0078d7;
+    }
+
+    .tk-native-btn:active {
+      background: #bce0f8;
+      border-color: #005499;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body class="tk-llpl-body">
+  <div class="tk-llpl-window">
+
+    <div class="tk-main-title">LL &amp; PL Synthetic Data Generator</div>
+    <div class="tk-subtitle">Enter Borehole &amp; Chainage once and fill the required sample rows.</div>
+
+    <!-- Borehole Information -->
+    <fieldset class="tk-lf">
+      <legend class="tk-lf-legend">Borehole Information</legend>
+      <div class="tk-bh-grid">
+        <label for="bh_var">Borehole No.</label>
+        <input type="text" id="bh_var" class="tk-bh-entry" value="">
+        <label for="chainage_var" style="padding-left: 14px;">Chainage</label>
+        <input type="text" id="chainage_var" class="tk-bh-entry" value="">
+      </div>
+    </fieldset>
+
+    <!-- 15-Row Sample Inputs -->
+    <fieldset class="tk-table-frame">
+      <legend class="tk-lf-legend">Sample Inputs — Maximum 15 Rows</legend>
+
+      <div class="tk-table-header-grid">
+        <div class="tk-th">Sr. No.</div>
+        <div class="tk-th">Depth</div>
+        <div class="tk-th">Sample Type</div>
+        <div class="tk-th">Liquid Limit (LL)</div>
+        <div class="tk-th">Plastic Limit (PL)</div>
+        <div></div>
+      </div>
+
+      <!-- Scrollable container for 15 rows -->
+      <div class="tk-rows-scroll" id="rowsContainer">
+        <!-- Generated by JavaScript (1..15) -->
+      </div>
+    </fieldset>
+
+    <!-- Bottom Bar -->
+    <div class="tk-bottom-bar">
+      <div class="tk-status-label" id="statusLabel">Enter Borehole &amp; Chainage once, then enter up to 15 samples.</div>
+      <div class="tk-btn-group">
+        <button type="button" class="tk-native-btn" id="btnClearAll">Clear All</button>
+        <button type="button" class="tk-native-btn" id="btnGenerateExcel">Generate Excel</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/ll_pl.js') }}"></script>
+</body>
+
+</html>

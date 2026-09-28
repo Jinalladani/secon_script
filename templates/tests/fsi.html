@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Swell Index (FSI) Data Generator</title>
+  
+  <!-- Native Desktop Tkinter Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dst.css') }}">
+  <style>
+    .fsi-soil-select {
+      width: 100%;
+      height: 22px;
+      padding: 1px 4px;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-size: 8.5pt;
+      background: white;
+      border: 1px solid #7a7a7a;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body class="dst-native-gui">
+  <div class="tk-window" style="max-width: 1250px;">
+    
+    <!-- Title -->
+    <div class="tk-title" style="font-size: 18pt;">
+      Free Swell Index (FSI) Data Generator
+    </div>
+
+    <!-- 1. SINGLE BH ID -->
+    <fieldset class="tk-labelframe">
+      <legend class="tk-legend">Borehole Information</legend>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <label for="bh_id" style="font-size: 9pt; width: 50px;">BH ID</label>
+        <input type="text" id="bh_id" value="RBH-12" class="tk-entry" style="width: 180px;">
+        <span class="tk-note" style="margin-top: 0;">Single BH ID for all entered sample depths.</span>
+      </div>
+    </fieldset>
+
+    <!-- 2. MULTI-DEPTH SAMPLE INPUT -->
+    <fieldset class="tk-labelframe">
+      <legend class="tk-legend">Multi-Depth Sample Input</legend>
+      
+      <div class="tk-table-container" style="max-height: 220px; overflow-y: auto;">
+        <table class="tk-depth-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="width: 55px;">#</th>
+              <th style="width: 180px;">Sample Depth (m)</th>
+              <th style="width: 160px;">Sample Type</th>
+              <th style="width: 400px; text-align: left; padding-left: 10px;">Soil Description</th>
+              <th style="width: 95px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="depthTableBody">
+            <!-- Dynamic Depth Rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Buttons below depth table -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+        <button class="tk-btn" id="btnAddDepth">+ Add Depth</button>
+        <button class="tk-btn" id="btnClearDepths">Clear Depths</button>
+        <span class="tk-note" style="margin-top: 0; margin-left: 15px;">
+          Each depth has its own Sample Type and Soil Description.
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- 3. ACTION BUTTON BAR -->
+    <div class="tk-btn-bar" style="margin: 10px 0;">
+      <div class="tk-btn-group-left">
+        <button class="tk-btn" id="btnGenerate" style="font-weight: bold;">Generate FSI Data</button>
+        <button class="tk-btn" id="btnClearGenerated">Clear Generated Data</button>
+        <button class="tk-btn" id="btnExportExcel">Export to Excel</button>
+      </div>
+      <div class="tk-btn-group-right">
+        <span class="tk-status" id="statusVar" style="margin: 0;">Ready</span>
+      </div>
+    </div>
+
+    <!-- 4. GENERATED OBSERVATION TABLE (Treeview) -->
+    <fieldset class="tk-labelframe" style="min-height: 280px;">
+      <legend class="tk-legend">Generated Observation Table</legend>
+      
+      <div class="tk-treeview-box" style="height: 260px; overflow: auto;">
+        <table class="tk-treeview">
+          <thead>
+            <tr>
+              <th style="width: 60px;">SR No</th>
+              <th style="width: 90px;">BH ID</th>
+              <th style="width: 100px;">Sample ID</th>
+              <th style="width: 95px;">Sample Type</th>
+              <th style="width: 85px;">Depth (m)</th>
+              <th style="width: 285px;">Soil Description</th>
+              <th style="width: 75px;">Vk (mL)</th>
+              <th style="width: 75px;">Vd (mL)</th>
+              <th style="width: 95px;">Difference</th>
+              <th style="width: 110px;">Free Swell (%)</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody">
+            <!-- Results Rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tk-note" style="margin-top: 8px;">
+        FSI = ((Vd - Vk) / Vk) × 100   |   Vk and Vd are whole-number mL readings (1 mL cylinder resolution)
+      </div>
+    </fieldset>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/fsi.js') }}"></script>
+</body>
+</html>

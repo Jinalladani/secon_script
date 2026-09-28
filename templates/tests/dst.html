@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synthetic Direct Shear Test Data Generator - Multi Depth v2</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dst.css') }}">
+  <style>
+    body.dst-native-gui {
+      background-color: #f0f0f0;
+      color: #000000;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 9pt;
+      margin: 0;
+      padding: 12px;
+    }
+
+    .tk-window {
+      max-width: 1220px;
+      margin: 0 auto;
+      background-color: #f0f0f0;
+    }
+
+    .tk-title {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 16pt;
+      font-weight: bold;
+      color: #000000;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .tk-labelframe {
+      border: 1px solid #d0d0d0;
+      background-color: #f0f0f0;
+      padding: 8px 12px 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .tk-legend {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      font-weight: normal;
+      color: #000000;
+      padding: 0 4px;
+    }
+
+    /* Common inputs grid */
+    .tk-common-grid {
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 6px 14px;
+    }
+
+    .tk-common-grid label {
+      font-size: 9pt;
+      color: #000000;
+      white-space: nowrap;
+    }
+
+    .tk-entry {
+      background-color: #ffffff;
+      border: 1px solid #7a7a7a;
+      border-radius: 0px;
+      padding: 2px 5px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      color: #000000;
+      height: 23px;
+      width: 130px;
+      outline: none;
+    }
+
+    .tk-entry:focus {
+      border: 1px solid #0078d7;
+    }
+
+    .tk-options-row {
+      grid-column: 3 / span 4;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .tk-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9pt;
+      color: #000000;
+      cursor: pointer;
+    }
+
+    /* Table styling */
+    .tk-table-container {
+      overflow-x: auto;
+      margin-top: 4px;
+    }
+
+    .tk-depth-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tk-depth-table th {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      font-weight: bold;
+      text-align: center;
+      padding: 3px 4px;
+      color: #000000;
+      white-space: nowrap;
+    }
+
+    .tk-depth-table td {
+      padding: 2px 3px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .tk-table-entry {
+      width: 100%;
+      background-color: #ffffff;
+      border: 1px solid #7a7a7a;
+      border-radius: 0px;
+      padding: 2px 4px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      text-align: center;
+      color: #000000;
+      height: 23px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .tk-table-entry:focus {
+      border: 1px solid #0078d7;
+    }
+
+    .tk-table-select {
+      width: 100%;
+      background-color: #ffffff;
+      border: 1px solid #7a7a7a;
+      border-radius: 0px;
+      padding: 1px 2px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      color: #000000;
+      height: 25px;
+      outline: none;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .tk-btn-remove {
+      background: linear-gradient(180deg, #fbfbfb 0%, #e1e1e1 100%);
+      border: 1px solid #707070;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      font-weight: bold;
+      color: #b91c1c;
+      width: 32px;
+      height: 23px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .tk-btn-remove:hover {
+      background: #fee2e2;
+      border-color: #dc2626;
+    }
+
+    .tk-note {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 8pt;
+      font-style: italic;
+      color: #333333;
+      margin-top: 6px;
+    }
+
+    /* Action button bar */
+    .tk-btn-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+    }
+
+    .tk-btn-group-left,
+    .tk-btn-group-right {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tk-btn {
+      background: linear-gradient(180deg, #fbfbfb 0%, #e1e1e1 100%);
+      border: 1px solid #707070;
+      border-radius: 2px;
+      padding: 3px 12px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      color: #000000;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      outline: none;
+      height: 26px;
+      white-space: nowrap;
+    }
+
+    .tk-btn:hover {
+      background: linear-gradient(180deg, #e5f1fb 0%, #cbe4f7 100%);
+      border-color: #0078d7;
+    }
+
+    .tk-btn:active {
+      background: #bce0f8;
+      border-color: #005499;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Results treeview */
+    .tk-treeview-box {
+      background-color: #ffffff;
+      border: 1px solid #7a7a7a;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .tk-treeview {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+    }
+
+    .tk-treeview th {
+      background-color: #f0f0f0;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      font-weight: normal;
+      text-align: center;
+      padding: 3px 6px;
+      border: 1px solid #d0d0d0;
+      color: #000000;
+      position: sticky;
+      top: 0;
+    }
+
+    .tk-treeview td {
+      padding: 2px 6px;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+    }
+
+    .tk-treeview tr:hover td {
+      background-color: #e5f1fb;
+    }
+
+    .tk-treeview tr.selected td {
+      background-color: #0078d7;
+      color: #ffffff;
+    }
+
+    /* Status */
+    .tk-status {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 9pt;
+      font-style: italic;
+      color: #000000;
+      margin: 4px 0 8px 0;
+    }
+
+    /* Canvas box */
+    .tk-canvas-frame {
+      background-color: #ffffff;
+      border: 1px solid #7a7a7a;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+    }
+
+    #dstCanvas {
+      background-color: #ffffff;
+      display: block;
+    }
+  </style>
+</head>
+
+<body class="dst-native-gui">
+  <div class="tk-window">
+
+    <!-- Title -->
+    <div class="tk-title">
+      SYNTHETIC DIRECT SHEAR TEST DATA GENERATOR
+    </div>
+
+    <!-- 1. TEST / COMMON INPUTS -->
+    <fieldset class="tk-labelframe">
+      <legend class="tk-legend">TEST / COMMON INPUTS</legend>
+      <div class="tk-common-grid">
+        <label for="bh_id">BH ID</label>
+        <input type="text" id="bh_id" value="" class="tk-entry">
+
+        <label for="pr_constant">PR Constant</label>
+        <input type="text" id="pr_constant" value="0.325" class="tk-entry">
+
+        <div></div>
+        <div></div>
+
+        <label for="normal_1">Normal Stress 1</label>
+        <input type="text" id="normal_1" value="0.50" class="tk-entry">
+
+        <label for="normal_2">Normal Stress 2</label>
+        <input type="text" id="normal_2" value="1.00" class="tk-entry">
+
+        <label for="normal_3">Normal Stress 3</label>
+        <input type="text" id="normal_3" value="1.50" class="tk-entry">
+
+        <label for="random_seed">Random Seed</label>
+        <input type="text" id="random_seed" value="AUTO" class="tk-entry">
+
+        <!-- Checkbuttons -->
+        <div class="tk-options-row">
+          <label class="tk-check">
+            <input type="checkbox" id="realistic_variation" checked>
+            <span>Realistic Soil Behaviour</span>
+          </label>
+          <label class="tk-check">
+            <input type="checkbox" id="instrument_variation" checked>
+            <span>Instrument Variation</span>
+          </label>
+          <label class="tk-check">
+            <input type="checkbox" id="natural_variation" checked>
+            <span>Natural Test Variation</span>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- 2. MULTIPLE DEPTH INPUT TABLE -->
+    <fieldset class="tk-labelframe">
+      <legend class="tk-legend">MULTIPLE DEPTH INPUT  (one row = one DST sample)</legend>
+      <div class="tk-table-container">
+        <table class="tk-depth-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">No.</th>
+              <th style="width: 140px;">Sample Depth (m)</th>
+              <th style="width: 190px;">Soil Type</th>
+              <th style="width: 160px;">Sample Type</th>
+              <th style="width: 130px;">Density (g/cc)</th>
+              <th style="width: 150px;">Sample Weight (g)</th>
+              <th style="width: 140px;">Target c (kg/cm²)</th>
+              <th style="width: 110px;">Target φ (°)</th>
+              <th style="width: 140px;">Behaviour Class</th>
+              <th style="width: 70px;">Remove</th>
+            </tr>
+          </thead>
+          <tbody id="depthTableBody">
+            <!-- Dynamic Rows -->
+          </tbody>
+        </table>
+      </div>
+      <div class="tk-note">
+        AUTOMATIC: Sample Weight (g) = Density (g/cc) × 90 cm³  |  Mould volume = 6 × 6 × 2.5 cm = 90 cm³
+      </div>
+    </fieldset>
+
+    <!-- 3. ACTION BUTTON BAR -->
+    <div class="tk-btn-bar">
+      <div class="tk-btn-group-left">
+        <button class="tk-btn" id="btnAddDepth">+ ADD DEPTH</button>
+        <button class="tk-btn" id="btnValidate">VALIDATE INPUT</button>
+        <button class="tk-btn" id="btnGenerate">GENERATE ALL DEPTHS</button>
+        <button class="tk-btn" id="btnExportExcel">EXPORT ALL TO EXCEL</button>
+        <button class="tk-btn" id="btnExportPlots">EXPORT FAILURE ENVELOPE PLOTS</button>
+      </div>
+      <div class="tk-btn-group-right">
+        <button class="tk-btn" id="btnReset">RESET</button>
+        <button class="tk-btn" id="btnImportExcel">IMPORT FROM EXCEL</button>
+        <input type="file" id="excelFileInput" accept=".xlsx,.xlsm" style="display: none;">
+      </div>
+    </div>
+
+    <!-- 4. CALCULATED STRENGTH ENVELOPE - ALL DEPTHS -->
+    <fieldset class="tk-labelframe">
+      <legend class="tk-legend">CALCULATED STRENGTH ENVELOPE - ALL DEPTHS</legend>
+      <div class="tk-treeview-box">
+        <table class="tk-treeview">
+          <thead>
+            <tr>
+              <th style="width: 90px;">Depth (m)</th>
+              <th style="width: 190px;">Soil Type</th>
+              <th style="width: 150px;">Sample Type</th>
+              <th style="width: 95px;">Target c</th>
+              <th style="width: 95px;">Target φ</th>
+              <th style="width: 105px;">Calculated c</th>
+              <th style="width: 105px;">Calculated φ</th>
+              <th style="width: 80px;">R²</th>
+              <th style="width: 70px;">Trials</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody">
+            <!-- Result Rows -->
+          </tbody>
+        </table>
+      </div>
+    </fieldset>
+
+    <!-- Status Line -->
+    <div class="tk-status" id="statusVar">
+      Enter one or more depths, then generate.
+    </div>
+
+    <!-- 5. SELECTED DEPTH - SYNTHETIC DIRECT SHEAR CURVES -->
+    <fieldset class="tk-labelframe">
+      <legend class="tk-legend">SELECTED DEPTH - SYNTHETIC DIRECT SHEAR CURVES</legend>
+      <div class="tk-canvas-frame">
+        <canvas id="dstCanvas" width="1120" height="780"></canvas>
+      </div>
+    </fieldset>
+
+  </div>
+
+  <!-- JavaScript Controller -->
+  <script src="{{ url_for('static', filename='js/dst.js') }}"></script>
+</body>
+
+</html>

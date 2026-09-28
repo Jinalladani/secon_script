@@ -1,0 +1,432 @@
+/* Exact Tkinter / Windows Desktop GUI Styling for DST */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body.dst-native-gui {
+  background-color: #f0f0f0;
+  color: #000000;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 9pt;
+  line-height: 1.3;
+  padding: 12px;
+}
+
+/* Scrollable Container matching Tkinter Canvas */
+.tk-window {
+  max-width: 1220px;
+  margin: 0 auto;
+  background-color: #f0f0f0;
+}
+
+/* Title */
+.tk-title {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 16pt;
+  font-weight: bold;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Tkinter LabelFrame (Groupbox) */
+.tk-labelframe {
+  border: 1px solid #d0d0d0;
+  background-color: #f0f0f0;
+  padding: 8px 12px 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 0px;
+}
+
+.tk-legend {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  font-weight: normal;
+  color: #000000;
+  padding: 0 4px;
+}
+
+/* Common Inputs Grid */
+.tk-common-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px 16px;
+  align-items: center;
+}
+
+.tk-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tk-field-row label {
+  width: 130px;
+  font-size: 9pt;
+  color: #000000;
+  flex-shrink: 0;
+}
+
+/* Tkinter native Entry widget */
+.tk-entry {
+  background-color: #ffffff;
+  border: 1px solid #7a7a7a;
+  border-radius: 0px;
+  padding: 2px 5px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  color: #000000;
+  height: 23px;
+  width: 130px;
+  outline: none;
+}
+
+.tk-entry:focus {
+  border: 1px solid #0078d7;
+}
+
+.tk-entry[readonly] {
+  background-color: #f0f0f0;
+  border: 1px solid #c0c0c0;
+  color: #555555;
+}
+
+/* Options / Checkboxes matching ttk.Checkbutton */
+.tk-options-row {
+  grid-column: 2 / span 2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.tk-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9pt;
+  color: #000000;
+  cursor: pointer;
+}
+
+.tk-check input[type="checkbox"] {
+  cursor: pointer;
+}
+
+/* Table styling matching Tkinter Grid */
+.tk-table-container {
+  overflow-x: auto;
+  margin-top: 4px;
+}
+
+.tk-depth-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tk-depth-table th {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  font-weight: bold;
+  text-align: center;
+  padding: 3px 4px;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.tk-depth-table td {
+  padding: 2px 3px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.tk-table-entry {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #7a7a7a;
+  border-radius: 0px;
+  padding: 2px 4px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  height: 22px;
+  outline: none;
+  text-align: center;
+}
+
+.tk-table-entry:focus {
+  border: 1px solid #0078d7;
+}
+
+.tk-table-select {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #7a7a7a;
+  border-radius: 0px;
+  padding: 1px 2px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  height: 22px;
+  outline: none;
+}
+
+.tk-note {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 8pt;
+  font-style: italic;
+  color: #000000;
+  margin-top: 6px;
+}
+
+/* Action Button Bar matching Tkinter ttk.Button */
+.tk-btn-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 0;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tk-btn-group-left, .tk-btn-group-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tk-btn {
+  background-color: #e1e1e1;
+  border: 1px solid #adadad;
+  border-radius: 2px;
+  padding: 3px 12px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  color: #000000;
+  cursor: pointer;
+  outline: none;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.tk-btn:hover {
+  background-color: #e5f1fb;
+  border-color: #0078d7;
+}
+
+.tk-btn:active {
+  background-color: #cce4f7;
+  border-color: #005499;
+}
+
+.tk-btn-remove {
+  background-color: #e1e1e1;
+  border: 1px solid #adadad;
+  border-radius: 2px;
+  padding: 1px 8px;
+  font-size: 9pt;
+  cursor: pointer;
+  height: 22px;
+}
+
+.tk-btn-remove:hover {
+  background-color: #ffcccc;
+  border-color: #cc0000;
+}
+
+/* Treeview matching ttk.Treeview */
+.tk-treeview-box {
+  background-color: #ffffff;
+  border: 1px solid #7a7a7a;
+  overflow-x: auto;
+  min-height: 120px;
+}
+
+.tk-treeview {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+}
+
+.tk-treeview th {
+  background-color: #f0f0f0;
+  border-right: 1px solid #d0d0d0;
+  border-bottom: 1px solid #d0d0d0;
+  padding: 3px 6px;
+  font-weight: normal;
+  text-align: center;
+  color: #000000;
+}
+
+.tk-treeview td {
+  padding: 3px 6px;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tk-treeview tbody tr {
+  cursor: pointer;
+}
+
+.tk-treeview tbody tr:hover {
+  background-color: #e5f1fb;
+}
+
+.tk-treeview tbody tr.selected {
+  background-color: #0078d7 !important;
+  color: #ffffff !important;
+}
+
+.tk-treeview tbody tr.selected td {
+  color: #ffffff !important;
+}
+
+/* Status text */
+.tk-status {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  font-style: italic;
+  color: #000000;
+  margin: 4px 0 6px 0;
+}
+
+/* Report canvas area matching Tkinter Canvas drawing */
+.tk-canvas-box {
+  background-color: #ffffff;
+  border: 1px solid #7a7a7a;
+  padding: 12px;
+  min-height: 600px;
+}
+
+.tk-report-outer {
+  border: 2px solid #222222;
+  background-color: #ffffff;
+  padding: 0;
+}
+
+.tk-report-title-box {
+  border-bottom: 2px solid #222222;
+  text-align: center;
+  padding: 12px 0 10px 0;
+}
+
+.tk-report-title-box h2 {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 22pt;
+  font-weight: bold;
+  color: #172554;
+  line-height: 1.1;
+}
+
+.tk-report-title-box h3 {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11pt;
+  font-weight: bold;
+  color: #172554;
+  margin-top: 4px;
+}
+
+.tk-report-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-bottom: 1px solid #222222;
+}
+
+.tk-report-info-table td {
+  border-right: 1px solid #222222;
+  padding: 6px 14px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  vertical-align: top;
+  width: 25%;
+}
+
+.tk-report-info-table td:last-child {
+  border-right: none;
+}
+
+.tk-info-row {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.tk-info-lbl {
+  font-weight: bold;
+  width: 115px;
+}
+
+.tk-graph-heading {
+  border-bottom: 1px solid #222222;
+  text-align: center;
+  padding: 8px 0;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  color: #000000;
+}
+
+.tk-chart-flex {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  border-bottom: 1px solid #222222;
+  padding: 10px;
+  gap: 12px;
+  background-color: #ffffff;
+}
+
+.tk-equation-box {
+  border: 1px solid #222222;
+  background-color: #ffffff;
+  padding: 14px;
+  font-family: "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 10pt;
+  line-height: 1.6;
+}
+
+.tk-eq-title { font-weight: bold; }
+.tk-eq-calc { font-weight: bold; font-size: 9pt; margin-bottom: 10px; }
+.tk-eq-c { font-weight: bold; color: #e00000; }
+.tk-eq-phi { font-weight: bold; color: #e00000; }
+.tk-eq-r2 { font-weight: bold; }
+
+.tk-results-heading {
+  border-bottom: 1px solid #222222;
+  text-align: center;
+  padding: 8px 0;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  color: #172bb5;
+}
+
+.tk-report-results-grid {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tk-report-results-grid th {
+  background-color: #f1f4fb;
+  border: 1px solid #222222;
+  padding: 6px 4px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  text-align: center;
+}
+
+.tk-report-results-grid td {
+  border: 1px solid #222222;
+  padding: 6px 4px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 9pt;
+  text-align: center;
+}

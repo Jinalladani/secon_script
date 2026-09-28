@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Assisted UCS Synthetic Data Generator — Multiple Depth</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dst.css') }}">
+  <style>
+    .tk-scroll-box {
+      width: 100%;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      border: 1px solid #7a7a7a;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .tk-scroll-box::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+    .tk-scroll-box::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border: 1px solid #dcdcdc;
+    }
+    .tk-scroll-box::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border: 1px solid #a8a8a8;
+      border-radius: 2px;
+    }
+    .tk-scroll-box::-webkit-scrollbar-thumb:hover {
+      background: #a0a0a0;
+    }
+    .tk-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .tk-modal-window {
+      background: #f0f0f0;
+      border: 2px solid #0078d7;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      padding: 12px;
+      max-width: 1100px;
+      width: 95%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body class="dst-native-gui">
+  <div class="tk-window" style="max-width: 1420px; width: 100%; margin: 0 auto;">
+    
+    <!-- Top Back to Portal Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+      <a href="/" style="color: #0066cc; text-decoration: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 4px;">
+        <i class="fas fa-arrow-left"></i> Back to Main Portal
+      </a>
+      <span style="font-size: 8.5pt; color: #666;">GOMA Geotechnical Laboratory Suite</span>
+    </div>
+
+    <!-- Title -->
+    <div class="tk-title" style="font-size: 15pt; text-align: left; margin-bottom: 6px;">
+      AI-Assisted UCS Synthetic Data Generator — Multiple Depth
+    </div>
+
+    <!-- 1. Common Project Information -->
+    <fieldset class="tk-labelframe" style="padding: 8px 12px; margin-bottom: 6px;">
+      <legend class="tk-legend">Project Information</legend>
+      <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label for="bh_id" style="font-size: 9pt; font-weight: bold;">BH ID:</label>
+          <input type="text" id="bh_id" value="BH-01" class="tk-entry" style="width: 180px;">
+        </div>
+        <span class="tk-note" style="margin: 0; font-size: 8.5pt; color: #333333;">
+          B11:B42 is fixed at 0, 50, 100 ... 1550. C/D/E/G/H are written as Excel formulas.
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- 2. Multiple Depth Input -->
+    <fieldset class="tk-labelframe" style="padding: 7px 10px; margin-bottom: 6px;">
+      <legend class="tk-legend">MULTIPLE DEPTH INPUT — Soil Type and Sample Type are entered separately for EVERY depth</legend>
+      <div style="font-size: 8.5pt; color: #333333; margin-bottom: 5px;">
+        Every depth has its own Depth, Diameter, Height, Density, Assigned UCS, PR Constant, Soil Type, and Sample Type.
+      </div>
+
+      <div class="tk-scroll-box" style="max-height: 220px;">
+        <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; min-width: 1050px; white-space: nowrap;">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Depth (m)</th>
+              <th style="width: 95px;">Diameter (cm)</th>
+              <th style="width: 95px;">Height (cm)</th>
+              <th style="width: 105px;">Density (gm/cc)</th>
+              <th style="width: 140px;">Assigned UCS (kg/cm²)</th>
+              <th style="width: 130px;">PR Constant (kg/div)</th>
+              <th style="width: 135px;">Soil Type</th>
+              <th style="width: 95px;">Sample Type</th>
+              <th style="width: 95px;">Random Seed</th>
+              <th style="width: 130px;">Status</th>
+              <th style="width: 55px;">Select</th>
+            </tr>
+          </thead>
+          <tbody id="ucsTableBody">
+            <!-- Dynamic Depth Rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; align-items: center;">
+        <button type="button" class="tk-btn" id="btnAddDepth">+ Add Depth</button>
+        <button type="button" class="tk-btn" id="btnRemoveSelected">Remove Selected</button>
+        <button type="button" class="tk-btn" id="btnClearAll">Clear All</button>
+        <button type="button" class="tk-btn" id="btnAdd5Depths">Add 5 Depth Rows</button>
+        <button type="button" class="tk-btn" id="btnImportExcel" style="margin-left: 14px;">IMPORT EXCEL</button>
+        <input type="file" id="ucsFileInput" accept=".xlsx,.xlsm" style="display: none;">
+        <button type="button" class="tk-btn" id="btnGenerateAll" style="font-weight: bold; margin-left: 14px; padding: 3px 14px;">Generate ALL Depths</button>
+        <span style="font-size: 8pt; color: #666; margin-left: auto;">Click on any row to preview stress-strain curve</span>
+      </div>
+    </fieldset>
+
+    <!-- 3. XLSM Template Selection -->
+    <fieldset class="tk-labelframe" style="padding: 7px 10px; margin-bottom: 6px;">
+      <legend class="tk-legend">XLSM Template</legend>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <input type="text" id="templatePath" value="UCS Template.xlsm" class="tk-entry" style="flex: 1;" readonly>
+        <button type="button" class="tk-btn" id="btnBrowseTemplate">Browse XLSM</button>
+        <input type="file" id="ucsTemplateInput" accept=".xlsm" style="display: none;">
+      </div>
+    </fieldset>
+
+    <!-- 4. Action Buttons Bar -->
+    <div style="display: flex; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; align-items: center;">
+      <button type="button" class="tk-btn" id="btnGenerateSelected">Generate Selected</button>
+      <button type="button" class="tk-btn" id="btnPreviewSelected">Preview Selected</button>
+      <button type="button" class="tk-btn" id="btnPopulateSelected">Populate Selected XLSM</button>
+      <button type="button" class="tk-btn" id="btnPopulateAll" style="margin-right: 14px;">Populate ALL Depths</button>
+      
+      <button type="button" class="tk-btn" id="btnExportPlot" style="font-weight: bold;">EXPORT PLOT</button>
+      <button type="button" class="tk-btn" id="btnExportAllPlots" style="font-weight: bold;">EXPORT ALL PLOTS</button>
+    </div>
+
+    <!-- Report Notice -->
+    <div style="font-size: 8.5pt; font-weight: bold; color: #123B8A; margin-bottom: 6px;">
+      REPORT EXPORT: Select a depth and click EXPORT PLOT, or click EXPORT ALL PLOTS.
+    </div>
+
+    <!-- 5. Lower Area: Stress-Strain Preview & 32 Observations Table -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px;">
+      
+      <!-- Left: Stress-Strain Preview -->
+      <fieldset class="tk-labelframe" style="margin: 0; padding: 6px;">
+        <legend class="tk-legend">Stress–Strain Preview</legend>
+        <div style="background: white; border: 1px solid #7a7a7a; height: 350px; min-height: 350px; position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 4px;">
+          <img id="ucsPreviewImage" src="" alt="Stress-Strain Curve Preview" style="max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; display: none;">
+          <canvas id="ucsCanvas" width="720" height="340" style="width: 100%; height: 100%; display: block;"></canvas>
+        </div>
+      </fieldset>
+
+      <!-- Right: Selected Depth — Generated Data (32 Rows) -->
+      <fieldset class="tk-labelframe" style="margin: 0; padding: 6px;">
+        <legend class="tk-legend">Selected Depth — Generated Data (32 Observations)</legend>
+        <div class="tk-scroll-box" style="height: 350px;">
+          <table class="tk-treeview" style="font-size: 8.5pt; width: 100%; white-space: nowrap;">
+            <thead>
+              <tr>
+                <th style="width: 45px;">SR</th>
+                <th style="width: 65px;">Dial</th>
+                <th style="width: 75px;">cm</th>
+                <th style="width: 85px;">Strain %</th>
+                <th style="width: 70px;">PR</th>
+                <th style="width: 85px;">Load kg</th>
+                <th style="width: 95px;">Stress kg/cm²</th>
+              </tr>
+            </thead>
+            <tbody id="obsTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: #888; font-style: italic; padding: 40px;">
+                  Generate a depth to preview 32 observations.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+
+    </div>
+
+    <!-- 6. Status Bar -->
+    <div id="statusVar" style="font-size: 8.5pt; color: #000000; padding: 2px 4px;">
+      Ready. Edit depths and click Generate ALL Depths or Preview Selected.
+    </div>
+
+  </div>
+
+  <!-- Final Report Plot Modal -->
+  <div id="reportPlotModal" class="tk-modal-overlay">
+    <div class="tk-modal-window">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 11pt; font-weight: bold;" id="modalTitle">UCS Test Report Sheet</span>
+        <button type="button" class="tk-btn" id="btnModalClose" style="padding: 1px 8px;">✕</button>
+      </div>
+      
+      <!-- Depth selector dropdown -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <label style="font-size: 9pt; font-weight: bold;">Select Depth:</label>
+        <select id="modalDepthSelect" class="tk-table-select" style="width: 320px; font-weight: 500;"></select>
+        <button type="button" class="tk-btn" id="btnModalViewReport" style="font-weight: bold;">View Report Plot</button>
+        <button type="button" class="tk-btn" id="btnModalSavePng" style="margin-left: auto;">Save Plot Image (PNG)</button>
+      </div>
+
+      <!-- Report View Container -->
+      <div class="tk-scroll-box" style="flex: 1; min-height: 480px; background: white; text-align: center; padding: 8px;">
+        <img id="modalReportImage" src="" alt="Report Plot" style="max-width: 100%; height: auto; border: 1px solid #ccc; display: none; margin: 0 auto;">
+        <div id="modalLoading" style="padding: 60px; color: #666; font-size: 10pt;">
+          <i class="fas fa-spinner fa-spin" style="font-size: 20pt; color: #0078d7; margin-bottom: 10px;"></i><br>
+          Rendering high-resolution A4 landscape UCS report sheet...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/ucs.js') }}"></script>
+</body>
+</html>
